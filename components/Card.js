@@ -1,50 +1,62 @@
-import Image from "next/image";
 import styles from "../styles/Home.module.scss";
 
-export const Card = ({
-  apiUrl = "https://nextjs.org",
-  apiUrlLabel = "API url",
-  apiImgSource = "/api.",
-}) => {
+export const Card = ({ apiData }) => {
+  const {
+    title,
+    url,
+    logo,
+    description,
+    category,
+    version,
+    added,
+    swaggerUrl,
+  } = apiData;
+
+  const handleImgError = (e) =>
+    (e.target.src =
+      "https://api.apis.guru/v2/cache/logo/https_apis.guru_assets_images_no-logo.svg");
+
   return (
     <>
       <article className={styles.card}>
         <header>
-          <a target="_blank" rel="noreferrer" href={apiUrl}>
-            {apiUrlLabel}
+          <a target="_blank" rel="noreferrer" href={url}>
+            {title}
           </a>
         </header>
         <section>
-          <div className={styles.panel_logo}>
-            <a target="_blank" rel="noreferrer" href={apiUrl}>
-              {/* <Image src={apiImgSource} alt="Logo" width={90} height={90} /> */}
-              <img src="https://fakeimg.pl/90x90/"></img>
+          <div
+            className={styles.panel_logo}
+            style={{ backgroundColor: logo.backgroundColor }}
+          >
+            <a target="_blank" rel="noreferrer" href={url}>
+              <img src={logo.url} alt="Logo" onError={handleImgError} />
             </a>
           </div>
-          <div className={styles.panel_description}>
-            <p>
-              dolorem ipsum, quia dolor sit amet consectetur adipisci velit, sed
-              quia non numquam
-            </p>
-          </div>
+          <div
+            className={styles.panel_description}
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
         </section>
         <footer>
           <div className={styles.footer_header}>
-            <span> Footer description </span>
+            <span> {category} </span>
           </div>
           <div className={styles.footer_versions}>
             <div className={styles.footer_date}>
-              <span>2019-05-01 </span>{" "}
+              <span>{added} </span>
             </div>
             <div className={styles.footer_version}>
-              <span>v 2.5.0-pre </span>
+              <span>{version} </span>
             </div>
           </div>
           <div className={styles.footer_action}>
             <div className={styles.download}>
-              <svg width="18px" height="24px" >
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-              </svg>
+              <a target="_blank" rel="noreferrer" href={swaggerUrl}>
+                <svg width="18px" height="24px">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+              </a>
             </div>
           </div>
         </footer>

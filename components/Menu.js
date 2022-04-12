@@ -1,27 +1,23 @@
+import { useEffect } from "react";
 import styles from "../styles/Home.module.scss";
 
-export const Menu = () => {
+export const Menu = ({ categories, currentCategory, handleCategoryClick }) => {
   return (
     <aside className={styles.content_nav}>
       <ul>
-        <li>
-          <a> all</a>
-        </li>
-        <li>
-          <a> Category </a>
-        </li>
-        <li>
-          <a> Category </a>
-        </li>
-        <li>
-          <a> Category </a>
-        </li>
-        <li>
-          <a> Category </a>
-        </li>
-        <li>
-          <a> Category </a>
-        </li>
+        {categories.map((category, index) => {
+          let isActive = currentCategory === category;
+          return (
+            <li
+              key={index}
+              className={isActive && styles.active_category}
+              onClick={() => handleCategoryClick(category)}
+            >
+              <a>{category}</a>
+            </li>
+          );
+        })}
       </ul>
-    </aside>)
+    </aside>
+  );
 };
