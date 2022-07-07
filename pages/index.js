@@ -1,11 +1,10 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.scss";
 import { CardList } from "../components/CardList";
-import { Header } from "../components/Header";
 import { Menu } from "../components/Menu";
 import { useEffect, useState } from "react";
-import { Search } from "../components/Search";
 import Modal from "../components/Modal";
+import session from "../base/session";
 
 const transformApiData = (apiData) => {
   let preferred = apiData.preferred,
@@ -76,17 +75,18 @@ const transformApiData = (apiData) => {
 };
 
 export default function Home() {
+  const [authorizing, setAuthorizing] = useState(true);
   const [apis, setApis] = useState([]);
   const [categories, setCategories] = useState([]);
   const [currentCategory, setCurrentCategory] = useState("all");
   const [apiOfCategory, setApiOfCategory] = useState([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [modalData, setModalData] = useState({});
-
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    if (!loading) return;
+
     fetch("https://api.apis.guru/v2/list.json")
       .then((response) => response.json())
       .then((json) => Object.values(json).map((api) => transformApiData(api)))
@@ -102,7 +102,34 @@ export default function Home() {
         setCategories(["all", ...categories]);
         setLoading(false);
       });
-  }, []);
+  }, [loading]);
+
+  useEffect(() => {
+    if (!authorizing) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // eslint-disable-next-line consistent-return
+    window.addEventListener('message', (event) => {
+      const { origin, data: { cmd, tenantId, access } } = event;
+
+      if (origin !== 'https://app.cenit.io') return false;
+
+      if (cmd === 'refresh') session.set('account', { ...session.currentAccount, tenantId });
+
+      if (access) {
+        const { access_token: accessToken, expiration_date: expirationDate } = access;
+        session.set('account', { tenantId, accessToken, expirationDate });
+        setAuthorizing(false);
+      }
+    });
+
+    if (urlParams.has('token')) {
+      const token = urlParams.get('token');
+      session.set('token', token);
+      window.parent.postMessage({ cmd: 'getAccess', token }, '*');
+    }
+  }, [authorizing]);
 
   useEffect(() => {
     if (currentCategory === "all") {
@@ -156,7 +183,7 @@ export default function Home() {
             handleCategoryClick={handleCategoryClick}
           />
           <CardList
-            loading={loading}
+            loading={loading || authorizing}
             apis={apiOfCategory}
             handleSearchByName={handleSearchByName}
             currentCategory={currentCategory}

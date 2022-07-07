@@ -1,19 +1,19 @@
 import styles from "../styles/Home.module.scss";
+import DownloadAction from "./actions/Download";
+import ImportAction from "./actions/Import";
 
-export const handleImgError = (e) =>
-  (e.target.src =
-    "https://api.apis.guru/v2/cache/logo/https_apis.guru_assets_images_no-logo.svg");
+export const handleImgError = (e) => {
+  e.target.src = "https://api.apis.guru/v2/cache/logo/https_apis.guru_assets_images_no-logo.svg";
+};
 
 export const Card = ({ apiData, handleOpenModal, fillModalData }) => {
   const {
     title,
-    url,
     logo,
     description,
     category,
     version,
     added,
-    swaggerUrl,
     detail,
   } = apiData;
 
@@ -66,13 +66,8 @@ export const Card = ({ apiData, handleOpenModal, fillModalData }) => {
             </div>
           </div>
           <div className={styles.footer_action}>
-            <div className={styles.download}>
-              <a target="_blank" rel="noreferrer" href={swaggerUrl}>
-                <svg width="18px" height="24px">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                </svg>
-              </a>
-            </div>
+            <DownloadAction apiData={apiData} />
+            <ImportAction apiData={apiData} />
           </div>
         </footer>
       </article>
